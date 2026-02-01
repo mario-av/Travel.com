@@ -5,6 +5,16 @@ set -e
 echo "Running migrations..."
 php artisan migrate --force
 
+# Seed database only if admin user doesn't exist (prevents duplicates)
+echo "Checking if seeding is needed..."
+php artisan tinker --execute="exit(App\Models\User::where('email', 'admin@travel.com')->exists() ? 0 : 1);" 2>/dev/null
+if [ $? -eq 1 ]; then
+    echo "Seeding database..."
+    php artisan db:seed --force
+else
+    echo "Database already seeded, skipping..."
+fi
+
 # Cache configuration
 echo "Caching configuration..."
 php artisan config:cache
