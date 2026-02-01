@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Page Not Found - Travel.com')
+@section('title', 'Page Not Found - traveldotcom')
 
 @section('content')
 <div class="min-h-[70vh] flex items-center justify-center px-4">

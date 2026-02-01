@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $vacation->title . ' - Travel.com')
+@section('title', $vacation->title . ' - traveldotcom')
 
 @section('content')
 {{-- Hero Image --}}

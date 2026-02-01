@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Profile - Travel.com')
+@section('title', 'Edit Profile - traveldotcom')
 
 @section('content')
 <div class="py-8">

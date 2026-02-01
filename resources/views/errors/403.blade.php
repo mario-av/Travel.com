@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Access Denied - Travel.com')
+@section('title', 'Access Denied - traveldotcom')
 
 @section('content')
 <div class="min-h-[70vh] flex items-center justify-center px-4">

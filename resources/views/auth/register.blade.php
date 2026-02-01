@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Register - Travel.com')
+@section('title', 'Register - traveldotcom')
 
 @section('content')
 <div class="min-h-[70vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -9,7 +9,7 @@
             <div class="text-center mb-8">
                 <i class="bi bi-airplane-engines-fill text-accent text-4xl mb-2"></i>
                 <h2 class="text-2xl font-bold text-gray-800">Create Account</h2>
-                <p class="text-gray-500">Join Travel.com today</p>
+                <p class="text-gray-500">Join traveldotcom today</p>
             </div>
 
             <form method="POST" action="{{ route('register') }}">

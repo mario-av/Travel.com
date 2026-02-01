@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'My Dashboard - Travel.com')
+@section('title', 'My Dashboard - traveldotcom')
 
 @section('content')
 <div class="py-12 bg-gray-50 min-h-screen" x-data="{ activeTab: '{{ $tab ?? 'overview' }}' }">

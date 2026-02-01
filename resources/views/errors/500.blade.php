@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Something Went Wrong - Travel.com')
+@section('title', 'Something Went Wrong - traveldotcom')
 
 @section('content')
 <div class="min-h-[70vh] flex items-center justify-center px-4">

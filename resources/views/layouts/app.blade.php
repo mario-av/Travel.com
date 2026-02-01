@@ -5,22 +5,22 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Travel.com - Vacation Deals')</title>
-    <meta name="description" content="@yield('meta_description', 'Discover amazing vacation deals and create unforgettable memories with Travel.com. Book your next adventure today.')">
+    <title>@yield('title', 'traveldotcom - Vacation Deals')</title>
+    <meta name="description" content="@yield('meta_description', 'Discover amazing vacation deals and create unforgettable memories with traveldotcom. Book your next adventure today.')">
     <meta name="keywords" content="@yield('meta_keywords', 'travel, vacation, holidays, booking, flight, hotel, tourism')">
 
     {{-- Open Graph / Facebook --}}
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="@yield('title', 'Travel.com - Vacation Deals')">
-    <meta property="og:description" content="@yield('meta_description', 'Discover amazing vacation deals and create unforgettable memories with Travel.com.')">
+    <meta property="og:title" content="@yield('title', 'traveldotcom - Vacation Deals')">
+    <meta property="og:description" content="@yield('meta_description', 'Discover amazing vacation deals and create unforgettable memories with traveldotcom.')">
     <meta property="og:image" content="@yield('meta_image', asset('images/default-share.jpg'))">
 
     {{-- Twitter --}}
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="{{ url()->current() }}">
-    <meta property="twitter:title" content="@yield('title', 'Travel.com - Vacation Deals')">
-    <meta property="twitter:description" content="@yield('meta_description', 'Discover amazing vacation deals and create unforgettable memories with Travel.com.')">
+    <meta property="twitter:title" content="@yield('title', 'traveldotcom - Vacation Deals')">
+    <meta property="twitter:description" content="@yield('meta_description', 'Discover amazing vacation deals and create unforgettable memories with traveldotcom.')">
     <meta property="twitter:image" content="@yield('meta_image', asset('images/default-share.jpg'))">
 
     {{-- Tailwind CSS CDN --}}
@@ -128,7 +128,7 @@
                 <div class="flex items-center">
                     <a href="{{ route('main.index') }}" class="flex items-center space-x-2">
                         <i class="bi bi-airplane-engines-fill text-rose-500 text-2xl"></i>
-                        <span class="text-rose-500 font-bold text-xl tracking-tighter uppercase">travel.com</span>
+                        <span class="text-rose-500 font-bold text-xl tracking-tighter uppercase">traveldotcom</span>
                     </a>
                 </div>
 
@@ -238,7 +238,7 @@
                 <div class="space-y-6">
                     <a href="{{ route('main.index') }}" class="flex items-center space-x-2">
                         <i class="bi bi-airplane-engines-fill text-accent text-3xl"></i>
-                        <span class="text-white font-bold text-2xl tracking-tighter uppercase">travel.com</span>
+                        <span class="text-white font-bold text-2xl tracking-tighter uppercase">traveldotcom</span>
                     </a>
                     <p class="text-gray-400 leading-relaxed">
                         Making world-class travel experiences accessible to everyone. Explore, book, and enjoy your next adventure with confidence.
@@ -293,7 +293,7 @@
             </div>
 
             <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
-                <p>&copy; {{ date('Y') }} Travel.com Inc. &bull; <a href="#" class="hover:underline">Privacy</a> &bull; <a href="#" class="hover:underline">Terms</a> &bull; <a href="#" class="hover:underline">Sitemap</a></p>
+                <p>&copy; {{ date('Y') }} traveldotcom Inc. &bull; <a href="#" class="hover:underline">Privacy</a> &bull; <a href="#" class="hover:underline">Terms</a> &bull; <a href="#" class="hover:underline">Sitemap</a></p>
                 <div class="flex items-center space-x-4 mt-4 md:mt-0">
                     <span class="flex items-center"><i class="bi bi-globe me-2"></i> English (US)</span>
                     <span class="flex items-center font-bold text-gray-300">$ USD</span>

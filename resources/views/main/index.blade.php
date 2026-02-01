@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Travel.com - Explore Vacation Deals')
+@section('title', 'traveldotcom - Explore Vacation Deals')
 
 @section('modal')
 {{-- Order Modal --}}
