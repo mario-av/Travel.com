@@ -95,9 +95,9 @@
 
 @section('content')
 {{-- Hero Section --}}
-<section class="relative bg-black py-24 md:py-32 overflow-hidden -mt-[1px]" style="background-image: url('https://images.pexels.com/photos/1032650/pexels-photo-1032650.jpeg?auto=compress&cs=tinysrgb&w=1920'); background-size: cover; background-position: center;">
+<section class="relative bg-black py-24 md:py-32 overflow-hidden -mt-[1px]" style="background-image: url('https://images.pexels.com/photos/1144176/pexels-photo-1144176.jpeg?auto=compress&cs=tinysrgb&w=1920'); background-size: cover; background-position: center;">
     <!-- Background Video -->
-    <video autoplay muted loop playsinline poster="https://images.pexels.com/photos/1032650/pexels-photo-1032650.jpeg?auto=compress&cs=tinysrgb&w=1920" class="absolute inset-0 w-full h-full object-cover opacity-60">
+    <video autoplay muted loop playsinline poster="https://images.pexels.com/photos/1144176/pexels-photo-1144176.jpeg?auto=compress&cs=tinysrgb&w=1920" class="absolute inset-0 w-full h-full object-cover opacity-60">
         <source src="https://assets.mixkit.co/videos/preview/mixkit-traveling-on-a-highway-through-the-forest-42887-large.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
