@@ -13,11 +13,8 @@ use Illuminate\Notifications\Notifiable;
  *
  * Roles:
  * - `user`: Default role for registered users.
+ * - `advanced`: Can create/edit their own vacations.
  * - `admin`: Full administrative access.
- *
- * Email Verification:
- * - Users must verify email to make bookings.
- * - Users must have booked a vacation to leave reviews.
  *
  * @property int $id
  * @property string $name
@@ -66,23 +63,44 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Check if user has a specific role.
+     *
+     * @param string $rol The role to check.
+     * @return bool
+     */
+    public function isRol(string $rol): bool
+    {
+        return $this->rol === $rol;
+    }
+
+    /**
      * Check if user is admin.
      *
      * @return bool
      */
     public function isAdmin(): bool
     {
-        return $this->rol === 'admin';
+        return $this->isRol('admin');
     }
 
     /**
-     * Check if user has verified their email.
+     * Check if user is advanced (or admin).
      *
      * @return bool
      */
-    public function isVerified(): bool
+    public function isAdvanced(): bool
     {
-        return $this->email_verified_at !== null;
+        return $this->isRol('advanced') || $this->isRol('admin');
+    }
+
+    /**
+     * Check if user is regular user.
+     *
+     * @return bool
+     */
+    public function isUser(): bool
+    {
+        return $this->isRol('user');
     }
 
     /**
@@ -100,7 +118,7 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Get the vacations created by this user (admin only).
+     * Get the vacations created by this user.
      *
      * @return HasMany
      */

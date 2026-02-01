@@ -4,58 +4,33 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
 /**
- * HomeController - Handles user dashboard and profile operations.
- * Provides user's personal dashboard with bookings and profile management.
+ * HomeController - User dashboard and profile management.
  */
 class HomeController extends Controller
 {
     /**
-     * Display the user's dashboard.
+     * Constructor - Apply middleware.
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('verified')->except(['index']);
+    }
+
+    /**
+     * Display the user dashboard.
      *
      * @return View The dashboard view.
      */
     public function index(): View
     {
-        try {
-            $user = auth()->user();
-
-            $recentBookings = $user->bookings()
-                ->with(['vacation.photos' => fn($q) => $q->where('is_main', true)])
-                ->orderBy('created_at', 'desc')
-                ->take(5)
-                ->get();
-
-            $pendingBookings = $user->bookings()
-                ->where('status', 'pending')
-                ->count();
-
-            $confirmedBookings = $user->bookings()
-                ->where('status', 'confirmed')
-                ->count();
-
-            $totalReviews = $user->reviews()->count();
-
-            return view('auth.home', compact(
-                'user',
-                'recentBookings',
-                'pendingBookings',
-                'confirmedBookings',
-                'totalReviews'
-            ));
-        } catch (\Exception $e) {
-            return view('auth.home', [
-                'user' => auth()->user(),
-                'recentBookings' => collect(),
-                'pendingBookings' => 0,
-                'confirmedBookings' => 0,
-                'totalReviews' => 0,
-                'error' => 'Error loading dashboard data.'
-            ]);
-        }
+        return view('auth.home');
     }
 
     /**
@@ -65,7 +40,7 @@ class HomeController extends Controller
      */
     public function edit(): View
     {
-        return view('auth.edit', ['user' => auth()->user()]);
+        return view('auth.edit');
     }
 
     /**
@@ -76,40 +51,53 @@ class HomeController extends Controller
      */
     public function update(Request $request): RedirectResponse
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'current_password' => 'nullable|required_with:password',
-            'password' => 'nullable|string|min:8|confirmed',
-        ]);
+        $rules = [
+            'current-password' => 'current_password',
+            'email' => 'required|max:255|email|unique:users,email,' . $user->id,
+            'name' => 'required|max:255',
+            'password' => 'nullable|min:8|confirmed',
+        ];
+
+        $messages = [
+            'name.required' => 'Name is required.',
+            'name.max' => 'Name cannot exceed 255 characters.',
+            'email.max' => 'Email cannot exceed 255 characters.',
+            'email.unique' => 'This email is already in use.',
+            'email.required' => 'Email is required.',
+            'email.email' => 'Invalid email format.',
+            'password.min' => 'Password must be at least 8 characters.',
+            'password.confirmed' => 'Passwords do not match.',
+            'current-password.current_password' => 'Current password is incorrect.',
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
+
+        if ($validator->fails()) {
+            return back()->withInput()->withErrors($validator);
+        }
+
+        $user->name = $request->name;
+
+        // If email changes, require re-verification
+        if ($user->email != $request->email) {
+            $user->email_verified_at = null;
+            $user->email = $request->email;
+        }
+
+        // Change password only if provided
+        if ($request->password != null) {
+            $user->password = Hash::make($request->password);
+        }
 
         try {
-            // Verify current password if changing password
-            if (!empty($validated['password'])) {
-                if (!Hash::check($validated['current_password'], $user->password)) {
-                    return redirect()
-                        ->back()
-                        ->with('error', 'Current password is incorrect.');
-                }
-                $validated['password'] = Hash::make($validated['password']);
-            } else {
-                unset($validated['password']);
-            }
-
-            unset($validated['current_password']);
-
-            $user->update($validated);
-
-            return redirect()
-                ->route('home')
-                ->with('success', 'Profile updated successfully.');
+            $user->save();
+            $message = 'Profile updated successfully.';
         } catch (\Exception $e) {
-            return redirect()
-                ->back()
-                ->withInput()
-                ->with('error', 'Error updating profile: ' . $e->getMessage());
+            $message = 'Error saving profile.';
         }
+
+        return redirect()->route('home')->with(['general' => $message]);
     }
 }

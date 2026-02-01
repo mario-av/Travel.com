@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Middleware\AdvancedMiddleware;
 use App\Models\Category;
 use App\Models\Photo;
 use App\Models\Vacation;
+use Illuminate\Database\QueryException;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -16,6 +20,27 @@ use Illuminate\View\View;
  */
 class VacationController extends Controller
 {
+    /**
+     * Constructor - Apply middleware.
+     */
+    public function __construct()
+    {
+        $this->middleware('verified')->except(['index', 'show']);
+        $this->middleware(AdvancedMiddleware::class)->except(['index', 'show']);
+    }
+
+    /**
+     * Check if user owns the vacation or is admin.
+     *
+     * @param Vacation $vacation The vacation to check.
+     * @return bool
+     */
+    private function ownerControl(Vacation $vacation): bool
+    {
+        $user = Auth::user();
+        return $user->id == $vacation->user_id || $user->rol == 'admin';
+    }
+
     /**
      * Display a listing of vacations for admin management.
      *
@@ -32,7 +57,7 @@ class VacationController extends Controller
         } catch (\Exception $e) {
             return view('vacation.manage', [
                 'vacations' => collect(),
-                'error' => 'Error loading vacations: ' . $e->getMessage()
+                'error' => 'Error loading vacations.'
             ]);
         }
     }
@@ -56,10 +81,12 @@ class VacationController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        $result = false;
+
         $validated = $request->validate([
-            'title' => 'required|string|max:200',
-            'description' => 'required|string',
-            'location' => 'required|string|max:150',
+            'title' => 'required|string|min:4|max:200',
+            'description' => 'required|string|min:10',
+            'location' => 'required|string|min:2|max:150',
             'price' => 'required|numeric|min:0',
             'duration_days' => 'required|integer|min:1',
             'available_slots' => 'required|integer|min:0',
@@ -70,15 +97,16 @@ class VacationController extends Controller
             'photos.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        try {
-            $validated['user_id'] = auth()->id();
-            $validated['featured'] = $request->boolean('featured');
-            $validated['active'] = true;
+        $vacation = new Vacation($validated);
+        $vacation->user_id = Auth::user()->id;
+        $vacation->featured = $request->boolean('featured');
+        $vacation->active = true;
 
-            $vacation = Vacation::create($validated);
+        try {
+            $result = $vacation->save();
 
             // Handle photo uploads
-            if ($request->hasFile('photos')) {
+            if ($result && $request->hasFile('photos')) {
                 foreach ($request->file('photos') as $index => $photo) {
                     $path = $photo->store('vacations', 'public');
                     Photo::create([
@@ -90,14 +118,21 @@ class VacationController extends Controller
                 }
             }
 
-            return redirect()
-                ->route('vacation.show', $vacation)
-                ->with('success', 'Vacation created successfully.');
+            $message = 'Vacation has been created.';
+        } catch (UniqueConstraintViolationException $e) {
+            $message = 'A vacation with these details already exists.';
+        } catch (QueryException $e) {
+            $message = 'Database error occurred.';
         } catch (\Exception $e) {
-            return redirect()
-                ->back()
-                ->withInput()
-                ->with('error', 'Error creating vacation: ' . $e->getMessage());
+            $message = 'An error occurred.';
+        }
+
+        $messageArray = ['general' => $message];
+
+        if ($result) {
+            return redirect()->route('vacation.show', $vacation->id)->with($messageArray);
+        } else {
+            return back()->withInput()->withErrors($messageArray);
         }
     }
 
@@ -109,31 +144,28 @@ class VacationController extends Controller
      */
     public function show(Vacation $vacation): View
     {
-        try {
-            $vacation->load([
-                'category',
-                'user',
-                'photos',
-                'reviews' => fn($q) => $q->where('approved', true)->with('user'),
-            ]);
+        $vacation->load([
+            'category',
+            'user',
+            'photos',
+            'reviews' => fn($q) => $q->where('approved', true)->with('user'),
+        ]);
 
-            return view('vacation.show', compact('vacation'));
-        } catch (\Exception $e) {
-            return view('vacation.show', [
-                'vacation' => null,
-                'error' => 'Error loading vacation details.'
-            ]);
-        }
+        return view('vacation.show', compact('vacation'));
     }
 
     /**
      * Show the form for editing the specified vacation.
      *
      * @param Vacation $vacation The vacation to edit.
-     * @return View The edit vacation form.
+     * @return RedirectResponse|View The edit vacation form or redirect.
      */
-    public function edit(Vacation $vacation): View
+    public function edit(Vacation $vacation): RedirectResponse|View
     {
+        if (!$this->ownerControl($vacation)) {
+            return redirect()->route('landing');
+        }
+
         $categories = Category::all();
         $vacation->load('photos');
         return view('vacation.edit', compact('vacation', 'categories'));
@@ -148,10 +180,16 @@ class VacationController extends Controller
      */
     public function update(Request $request, Vacation $vacation): RedirectResponse
     {
+        if (!$this->ownerControl($vacation)) {
+            return redirect()->route('landing');
+        }
+
+        $result = false;
+
         $validated = $request->validate([
-            'title' => 'required|string|max:200',
-            'description' => 'required|string',
-            'location' => 'required|string|max:150',
+            'title' => 'required|string|min:4|max:200',
+            'description' => 'required|string|min:10',
+            'location' => 'required|string|min:2|max:150',
             'price' => 'required|numeric|min:0',
             'duration_days' => 'required|integer|min:1',
             'available_slots' => 'required|integer|min:0',
@@ -167,7 +205,7 @@ class VacationController extends Controller
             $validated['featured'] = $request->boolean('featured');
             $validated['active'] = $request->boolean('active', true);
 
-            $vacation->update($validated);
+            $result = $vacation->update($validated);
 
             // Handle new photo uploads
             if ($request->hasFile('photos')) {
@@ -182,14 +220,19 @@ class VacationController extends Controller
                 }
             }
 
-            return redirect()
-                ->route('vacation.show', $vacation)
-                ->with('success', 'Vacation updated successfully.');
+            $message = 'Vacation has been updated.';
+        } catch (UniqueConstraintViolationException $e) {
+            $message = 'A vacation with these details already exists.';
         } catch (\Exception $e) {
-            return redirect()
-                ->back()
-                ->withInput()
-                ->with('error', 'Error updating vacation: ' . $e->getMessage());
+            $message = 'An error occurred.';
+        }
+
+        $messageArray = ['general' => $message];
+
+        if ($result) {
+            return redirect()->route('vacation.edit', $vacation->id)->with($messageArray);
+        } else {
+            return back()->withInput()->withErrors($messageArray);
         }
     }
 
@@ -201,21 +244,29 @@ class VacationController extends Controller
      */
     public function destroy(Vacation $vacation): RedirectResponse
     {
+        if (!$this->ownerControl($vacation)) {
+            return redirect()->route('landing');
+        }
+
         try {
             // Delete associated photos from storage
             foreach ($vacation->photos as $photo) {
                 Storage::disk('public')->delete($photo->path);
             }
 
-            $vacation->delete();
-
-            return redirect()
-                ->route('vacation.index')
-                ->with('success', 'Vacation deleted successfully.');
+            $result = $vacation->delete();
+            $message = 'Vacation has been deleted.';
         } catch (\Exception $e) {
-            return redirect()
-                ->back()
-                ->with('error', 'Error deleting vacation: ' . $e->getMessage());
+            $result = false;
+            $message = 'Could not delete the vacation.';
+        }
+
+        $messageArray = ['general' => $message];
+
+        if ($result) {
+            return redirect()->route('admin.vacation.index')->with($messageArray);
+        } else {
+            return back()->withInput()->withErrors($messageArray);
         }
     }
 }
