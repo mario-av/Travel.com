@@ -118,7 +118,7 @@
                                 <label class="absolute top-2 right-2 cursor-pointer z-10" title="Delete photo">
                                     <input type="checkbox" name="delete_photos[]" value="{{ $photo->id }}"
                                         class="hidden delete-checkbox"
-                                        onchange="togglePhotoMark({{ $photo->id }})">
+                                        onchange="return togglePhotoMark({{ $photo->id }})">
                                     <div class="delete-btn bg-white/90 hover:bg-white text-gray-600 hover:text-red-600 rounded-full w-8 h-8 flex items-center justify-center shadow-md transition-colors">
                                         <i class="bi bi-trash"></i>
                                     </div>

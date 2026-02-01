@@ -120,7 +120,7 @@
                                         </a>
                                         <button type="button"
                                             onclick="openDeleteModal('{{ addslashes($vacation->title) }}', '{{ route('vacation.destroy', $vacation) }}')"
-                                            class="text-gray-500 hover:text-red-600" title="Delete">
+                                            class="text-gray-500 hover:text-red-600 focus:outline-none" title="Delete">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </div>

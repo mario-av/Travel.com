@@ -101,10 +101,15 @@
                                 <td class="px-4 py-3">
                                     <form action="{{ route('admin.user.role', $user) }}" method="POST" class="flex items-center">
                                         @csrf
+                                        @php
+                                        $roleClasses = match($user->rol) {
+                                        'admin' => 'bg-red-50 text-red-700 border-red-100',
+                                        'advanced' => 'bg-purple-50 text-purple-700 border-purple-100',
+                                        default => 'bg-blue-50 text-blue-700 border-blue-100'
+                                        };
+                                        @endphp
                                         <select name="rol" onchange="this.form.submit()"
-                                            class="text-xs border-gray-200 rounded-lg focus:ring-rose-500 focus:border-rose-500 py-1 pl-2 pr-8
-                                            {{ $user->rol === 'admin' ? 'bg-red-50 text-red-700 border-red-100' : 
-                                               ($user->rol === 'advanced' ? 'bg-purple-50 text-purple-700 border-purple-100' : 'bg-blue-50 text-blue-700 border-blue-100') }}">
+                                            class="text-xs border-gray-200 rounded-lg focus:ring-rose-500 focus:border-rose-500 py-1 pl-2 pr-8 {{ $roleClasses }}">
                                             <option value="normal" {{ $user->rol === 'normal' ? 'selected' : '' }}>User</option>
                                             <option value="advanced" {{ $user->rol === 'advanced' ? 'selected' : '' }}>Advanced</option>
                                             <option value="admin" {{ $user->rol === 'admin' ? 'selected' : '' }}>Admin</option>

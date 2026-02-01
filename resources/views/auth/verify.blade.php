@@ -27,7 +27,7 @@
 
             <form method="POST" action="{{ route('verification.resend') }}">
                 @csrf
-                <button type="submit" class="w-full bg-rose-500 hover:bg-rose-600 text-white py-3 rounded-lg font-bold transition">
+                <button type="submit" class="w-full bg-accent hover:bg-accent-hover text-white py-3 rounded-lg font-bold transition">
                     <i class="bi bi-envelope me-2"></i>Resend Verification Email
                 </button>
             </form>
@@ -35,7 +35,7 @@
             <div class="mt-6 pt-6 border-t border-gray-200">
                 <p class="text-sm text-gray-500">
                     Wrong email?
-                    <a href="{{ route('home.edit') }}" class="text-rose-600 hover:underline">Update your email address</a>
+                    <a href="{{ route('home.edit') }}" class="text-accent hover:underline">Update your email address</a>
                 </p>
             </div>
         </div>
