@@ -35,6 +35,13 @@ class ReviewController extends Controller
         ]);
 
         try {
+            // Check if user has booked this vacation
+            if (!auth()->user()->hasBookedVacation($vacation->id)) {
+                return redirect()
+                    ->back()
+                    ->with('error', 'You must have booked this vacation to leave a review.');
+            }
+
             // Check if user already reviewed this vacation
             $existingReview = Review::where('user_id', auth()->id())
                 ->where('vacation_id', $vacation->id)

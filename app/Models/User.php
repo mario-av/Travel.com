@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -10,13 +11,22 @@ use Illuminate\Notifications\Notifiable;
 /**
  * User Model - Represents application users.
  *
+ * Roles:
+ * - `user`: Default role for registered users.
+ * - `admin`: Full administrative access.
+ *
+ * Email Verification:
+ * - Users must verify email to make bookings.
+ * - Users must have booked a vacation to leave reviews.
+ *
  * @property int $id
  * @property string $name
  * @property string $email
  * @property string $password
  * @property string $rol
+ * @property \DateTime|null $email_verified_at
  */
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable;
 
@@ -66,17 +76,31 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user is advanced.
+     * Check if user has verified their email.
      *
      * @return bool
      */
-    public function isAdvanced(): bool
+    public function isVerified(): bool
     {
-        return $this->rol === 'advanced' || $this->rol === 'admin';
+        return $this->email_verified_at !== null;
     }
 
     /**
-     * Get the vacations created by this user.
+     * Check if user has booked a specific vacation.
+     *
+     * @param int $vacationId The vacation ID to check.
+     * @return bool
+     */
+    public function hasBookedVacation(int $vacationId): bool
+    {
+        return $this->bookings()
+            ->where('vacation_id', $vacationId)
+            ->where('status', '!=', 'cancelled')
+            ->exists();
+    }
+
+    /**
+     * Get the vacations created by this user (admin only).
      *
      * @return HasMany
      */
