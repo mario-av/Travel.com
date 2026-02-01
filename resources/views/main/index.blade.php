@@ -95,13 +95,13 @@
 
 @section('content')
 {{-- Hero Section --}}
-<section class="relative bg-black py-24 md:py-32 overflow-hidden -mt-[1px]">
+<section class="relative bg-black py-24 md:py-32 overflow-hidden -mt-[1px]" style="background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&q=80'); background-size: cover; background-position: center;">
     <!-- Background Video -->
-    <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover opacity-50">
+    <video autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&q=80" class="absolute inset-0 w-full h-full object-cover opacity-60">
         <source src="https://assets.mixkit.co/videos/preview/mixkit-traveling-on-a-highway-through-the-forest-42887-large.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
-    <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/20 to-transparent"></div>
+    <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-transparent"></div>
 
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
         <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 drop-shadow-md">
