@@ -20,10 +20,10 @@
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
             <button onclick="window.location.reload()" class="w-full sm:w-auto px-8 py-4 bg-rose-500 hover:bg-rose-600 text-white rounded-2xl font-bold transition-all shadow-lg active:scale-95">
                 Try Again
-                </a>
-                <a href="{{ route('main.index') }}" class="w-full sm:w-auto px-8 py-4 bg-white border-2 border-gray-100 text-gray-600 hover:border-rose-500 hover:text-rose-500 rounded-2xl font-bold transition-all active:scale-95">
-                    Back Home
-                </a>
+            </button>
+            <a href="{{ route('main.index') }}" class="w-full sm:w-auto px-8 py-4 bg-white border-2 border-gray-100 text-gray-600 hover:border-rose-500 hover:text-rose-500 rounded-2xl font-bold transition-all active:scale-95">
+                Back Home
+            </a>
         </div>
     </div>
 </div>
