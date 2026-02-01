@@ -3,12 +3,12 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Middleware for advanced role verification.
- * Restricts access to advanced and admin users.
+ * AdvancedMiddleware - Restricts access to advanced users and admins.
  */
 class AdvancedMiddleware
 {
@@ -16,15 +16,16 @@ class AdvancedMiddleware
      * Handle an incoming request.
      *
      * @param Request $request The incoming request.
-     * @param Closure $next The next middleware in the chain.
-     * @return Response The response.
+     * @param Closure $next The next middleware.
+     * @return Response
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!auth()->check() || !auth()->user()->isAdvanced()) {
-            abort(403, 'Unauthorized. Advanced access required.');
+        $user = Auth::user();
+        if ($user != null && ($user->rol == 'admin' || $user->rol == 'advanced')) {
+            return $next($request);
+        } else {
+            return redirect()->route('main.index');
         }
-
-        return $next($request);
     }
 }
