@@ -319,25 +319,69 @@
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
                 body: JSON.stringify({
-                    color: color
+                    accent_color: color
                 })
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     // Live update variables
-                    const theme = themes[color];
-                    document.documentElement.style.setProperty('--accent-500', theme[500]);
-                    document.documentElement.style.setProperty('--accent-600', theme[600]);
-                    document.documentElement.style.setProperty('--accent-50', theme[50]);
+                    const themes = {
+                        rose: {
+                            500: '#f43f5e',
+                            600: '#e11d48',
+                            50: '#fff1f2'
+                        },
+                        indigo: {
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            50: '#eef2ff'
+                        },
+                        emerald: {
+                            500: '#10b981',
+                            600: '#059669',
+                            50: '#ecfdf5'
+                        },
+                        amber: {
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            50: '#fffbeb'
+                        },
+                        violet: {
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            50: '#f5f3ff'
+                        },
+                        cyan: {
+                            500: '#06b6d4',
+                            600: '#0891b2',
+                            50: '#ecfeff'
+                        },
+                        slate: {
+                            500: '#64748b',
+                            600: '#475569',
+                            50: '#f8fafc'
+                        },
+                        tangerine: {
+                            500: '#f97316',
+                            600: '#ea580c',
+                            50: '#fff7ed'
+                        }
+                    };
 
-                    // Update active indicator
+                    const theme = themes[color];
+                    if (theme) {
+                        document.documentElement.style.setProperty('--accent-500', theme[500]);
+                        document.documentElement.style.setProperty('--accent-600', theme[600]);
+                        document.documentElement.style.setProperty('--accent-50', theme[50]);
+                    }
+
+                    // Remove active ring from all buttons
                     document.querySelectorAll('button[onclick^="setAppTheme"]').forEach(btn => {
-                        btn.classList.remove('ring-rose-500', 'ring-indigo-500', 'ring-emerald-500', 'ring-amber-500',
-                            'ring-violet-500', 'ring-cyan-500', 'ring-slate-500', 'ring-orange-500');
-                        btn.classList.add('ring-transparent');
+                        btn.className = btn.className.replace(/ring-[a-z]+-500/g, 'ring-transparent');
                     });
 
+                    // Add active ring to clicked button
                     const ringClasses = {
                         rose: 'ring-rose-500',
                         indigo: 'ring-indigo-500',
