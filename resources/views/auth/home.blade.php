@@ -296,19 +296,19 @@
                                     class="w-full bg-gray-50 border-2 border-transparent focus:border-accent focus:bg-white rounded-2xl px-5 py-3 outline-none transition-all duration-200 font-bold text-gray-800">
                             </div>
                         </div>
-                </div>
 
-                <div class="pt-4">
-                    <button type="submit" class="w-full bg-accent hover:bg-accent-hover text-white py-4 rounded-2xl font-black uppercase tracking-widest transition-all shadow-lg active:scale-[0.98]">
-                        <i class="bi bi-check2-circle me-2"></i>Secure Update
-                    </button>
+                        <div class="pt-4">
+                            <button type="submit" class="w-full bg-accent hover:bg-accent-hover text-white py-4 rounded-2xl font-black uppercase tracking-widest transition-all shadow-lg active:scale-[0.98]">
+                                <i class="bi bi-check2-circle me-2"></i>Secure Update
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                </form>
             </div>
         </div>
     </div>
 </div>
-</div>
+
 
 <script>
     function setAppTheme(color) {
@@ -356,9 +356,4 @@
             });
     }
 </script>
-</div>
-</div>
-</div>
-</div>
-</div>
 @endsection
