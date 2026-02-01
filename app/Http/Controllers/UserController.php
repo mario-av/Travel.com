@@ -166,12 +166,12 @@ class UserController extends Controller
     }
 
     /**
-     * Bulk delete selected users.
+     * Delete multiple selected users.
      *
      * @param Request $request The request with user IDs.
      * @return RedirectResponse Redirect to user index.
      */
-    public function bulkDelete(Request $request): RedirectResponse
+    public function deleteGroup(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'users' => 'required|array',
