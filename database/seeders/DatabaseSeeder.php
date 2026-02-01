@@ -39,6 +39,14 @@ class DatabaseSeeder extends Seeder
             'rol' => 'advanced',
         ]);
 
+        // Create regular test user
+        $testUser = User::factory()->create([
+            'name' => 'Test User',
+            'email' => 'user@travel.com',
+            'password' => Hash::make('password'),
+            'rol' => 'user',
+        ]);
+
         // Create normal users
         $users = User::factory(5)->create();
 
