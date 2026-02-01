@@ -19,9 +19,13 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-COPY . .
+# Splitting copy to caching dependencies
+COPY composer.json composer.lock ./
 
-RUN composer install --no-dev --optimize-autoloader
+# Install dependencies without scripts (prevents errors due to missing env vars)
+RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-dev --optimize-autoloader --no-scripts
+
+COPY . .
 
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
