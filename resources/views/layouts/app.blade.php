@@ -317,7 +317,6 @@
 
             const showLoader = () => {
                 loader.classList.remove('hidden');
-                // Tiny delay to allow display flex to render before opacity transition
                 requestAnimationFrame(() => {
                     loader.classList.remove('opacity-0');
                 });
@@ -330,32 +329,41 @@
                 }, 300);
             };
 
+            // Hide loader on initial page load (in case it was stuck)
+            window.addEventListener('load', hideLoader);
+
+            // Global Click Listener (Event Delegation)
+            document.addEventListener('click', (e) => {
+                const link = e.target.closest('a');
+
+                if (!link) return;
+
+                const href = link.getAttribute('href');
+                const target = link.getAttribute('target');
+
+                // Logic to decide if we show loader
+                if (href &&
+                    href !== '#' &&
+                    !href.startsWith('javascript:') &&
+                    !href.startsWith('mailto:') &&
+                    !href.startsWith('tel:') &&
+                    (href.startsWith('/') || href.startsWith(window.location.origin) || !href.startsWith('http')) && // Internal links
+                    target !== '_blank' &&
+                    !e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey // Not opening in new tab
+                ) {
+                    showLoader();
+                }
+            });
+
             // Form Submissions
-            document.querySelectorAll('form').forEach(form => {
-                form.addEventListener('submit', () => {
-                    // Don't show if validation fails immediately (client-side)
-                    if (form.checkValidity()) {
-                        showLoader();
-                    }
-                });
+            document.addEventListener('submit', (e) => {
+                const form = e.target;
+                if (!e.defaultPrevented && form.checkValidity()) {
+                    showLoader();
+                }
             });
 
-            // Internal Links
-            document.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', (e) => {
-                    const href = link.getAttribute('href');
-                    // Check if it's a valid internal link and not opening in new tab
-                    if (href &&
-                        (href.startsWith('/') || href.startsWith(window.location.origin)) &&
-                        !href.startsWith('#') &&
-                        !e.ctrlKey && !e.metaKey && !e.shiftKey &&
-                        link.target !== '_blank') {
-                        showLoader();
-                    }
-                });
-            });
-
-            // Handle Back/Forward Cache
+            // Handle Back/Forward Cache (restores page from cache)
             window.addEventListener('pageshow', (event) => {
                 if (event.persisted) {
                     hideLoader();
