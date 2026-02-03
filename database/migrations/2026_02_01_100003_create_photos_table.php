@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Migration for creating the photos table.
- * Stores vacation package images.
+ * Stores vacation photos.
  */
 return new class extends Migration
 {
@@ -20,7 +20,7 @@ return new class extends Migration
         Schema::create('photos', function (Blueprint $table) {
             $table->id();
             $table->string('path', 255);
-            $table->string('original_name', 255)->nullable();
+            $table->string('original_name')->nullable();
             $table->boolean('is_main')->default(false);
             $table->foreignId('vacation_id')->constrained('vacations')->onDelete('cascade');
             $table->timestamps();

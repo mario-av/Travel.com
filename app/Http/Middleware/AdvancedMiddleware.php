@@ -22,7 +22,7 @@ class AdvancedMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         $user = Auth::user();
-        if ($user != null && ($user->rol == 'admin' || $user->rol == 'advanced')) {
+        if ($user != null && ($user->rol == 'admin' || $user->rol == 'advanced' || $user->rol == 'verified')) {
             return $next($request);
         } else {
             return redirect()->route('main.index');

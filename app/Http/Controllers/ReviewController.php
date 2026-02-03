@@ -69,12 +69,12 @@ class ReviewController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        // Check if user has booked this vacation
+
         if (!$user->hasBookedVacation($vacation->id)) {
             return back()->withErrors(['general' => 'You must have booked this vacation to leave a review.']);
         }
 
-        // Check if user already reviewed this vacation
+
         $existingReview = Review::where('user_id', Auth::user()->id)
             ->where('vacation_id', $vacation->id)
             ->first();
@@ -144,7 +144,7 @@ class ReviewController extends Controller
         $validated = $request->validated();
 
         try {
-            // Save current version to history
+
             $review->histories()->create([
                 'content' => $review->content,
                 'rating' => $review->rating,

@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Migration for creating the bookings table.
- * Stores user vacation bookings.
+ * Stores user bookings for vacations.
  */
 return new class extends Migration
 {
@@ -19,10 +19,7 @@ return new class extends Migration
     {
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
-            $table->integer('num_guests');
-            $table->decimal('total_price', 10, 2);
-            $table->enum('status', ['pending', 'confirmed', 'cancelled'])->default('pending');
-            $table->text('notes')->nullable();
+            $table->string('status')->default('pending');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('vacation_id')->constrained('vacations')->onDelete('cascade');
             $table->timestamps();

@@ -51,9 +51,14 @@ class VacationController extends Controller
     public function index(): View
     {
         try {
-            $vacations = Vacation::with(['category', 'user'])
-                ->orderBy('created_at', 'desc')
-                ->paginate(15);
+            $query = Vacation::with(['category', 'user'])->orderBy('created_at', 'desc');
+
+            // Admin sees all, Advanced/Verified sees only their own
+            if (!Auth::user()->isAdmin()) {
+                $query->where('user_id', Auth::id());
+            }
+
+            $vacations = $query->paginate(15);
 
             return view('vacation.manage', compact('vacations'));
         } catch (\Exception $e) {
@@ -81,6 +86,12 @@ class VacationController extends Controller
      * @param Request $request The incoming request with vacation data.
      * @return RedirectResponse Redirect to vacation show page.
      */
+    /**
+     * Store a newly created vacation in storage.
+     *
+     * @param VacationCreateRequest $request The incoming request with vacation data.
+     * @return RedirectResponse Redirect to vacation show page.
+     */
     public function store(VacationCreateRequest $request): RedirectResponse
     {
         $result = false;
@@ -88,6 +99,16 @@ class VacationController extends Controller
         $vacation->user_id = Auth::user()->id;
         $vacation->featured = $request->boolean('featured');
         $vacation->active = $request->boolean('active', true);
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        // Approval logic: Admin is auto-approved, Advanced requires approval
+        if ($user->isAdmin()) {
+            $vacation->approved = true;
+        } else {
+            $vacation->approved = false;
+        }
 
         try {
             $result = $vacation->save();
@@ -105,7 +126,11 @@ class VacationController extends Controller
                 }
             }
 
-            $message = 'Vacation has been created.';
+            if ($vacation->approved) {
+                $message = 'Vacation has been created.';
+            } else {
+                $message = 'Vacation created and pending approval.';
+            }
         } catch (UniqueConstraintViolationException $e) {
             $message = 'A vacation with these details already exists.';
         } catch (QueryException $e) {
@@ -184,22 +209,30 @@ class VacationController extends Controller
             $validated['featured'] = $request->boolean('featured');
             $validated['active'] = $request->boolean('active', true);
 
+            /** @var \App\Models\User $user */
+            $user = Auth::user();
+
+            // Re-require approval if edited by non-admin
+            if (!$user->isAdmin()) {
+                $validated['approved'] = false;
+            }
+
             $result = $vacation->update($validated);
 
-            // Handle photo deletions
+
             if ($request->has('delete_photos')) {
                 foreach ($request->input('delete_photos') as $photoId) {
                     $photo = Photo::find($photoId);
                     if ($photo && $photo->vacation_id === $vacation->id) {
-                        // Delete from storage
+
                         Storage::disk('public')->delete($photo->path);
-                        // Delete from database
+
                         $photo->delete();
                     }
                 }
             }
 
-            // Handle new photo uploads
+
             if ($request->hasFile('photos')) {
                 foreach ($request->file('photos') as $photo) {
                     $path = $photo->store('vacations', 'public');
@@ -241,7 +274,7 @@ class VacationController extends Controller
         }
 
         try {
-            // Delete associated photos from storage
+
             foreach ($vacation->photos as $photo) {
                 Storage::disk('public')->delete($photo->path);
             }
@@ -277,7 +310,7 @@ class VacationController extends Controller
         }
 
         try {
-            // Delete photos from storage first
+
             $vacations = Vacation::whereIn('id', $ids)->with('photos')->get();
             foreach ($vacations as $vacation) {
                 foreach ($vacation->photos as $photo) {

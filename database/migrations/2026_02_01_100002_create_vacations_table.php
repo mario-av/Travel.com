@@ -29,6 +29,7 @@ return new class extends Migration
             $table->date('end_date');
             $table->boolean('featured')->default(false);
             $table->boolean('active')->default(true);
+            $table->boolean('approved')->default(true); // Default true for legacy, false for new advanced users
             $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();

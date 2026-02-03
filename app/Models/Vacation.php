@@ -51,6 +51,7 @@ class Vacation extends Model
         'end_date',
         'featured',
         'active',
+        'approved',
         'category_id',
         'user_id',
     ];
@@ -64,6 +65,7 @@ class Vacation extends Model
         'price' => 'decimal:2',
         'featured' => 'boolean',
         'active' => 'boolean',
+        'approved' => 'boolean',
         'start_date' => 'date',
         'end_date' => 'date',
     ];
@@ -117,8 +119,11 @@ class Vacation extends Model
     {
         return $this->hasMany(Review::class, 'vacation_id');
     }
+
     /**
      * Get the count of approved reviews.
+     *
+     * @return int
      */
     public function getReviewsCountAttribute(): int
     {
@@ -127,6 +132,8 @@ class Vacation extends Model
 
     /**
      * Get the average rating of approved reviews.
+     *
+     * @return float
      */
     public function getAverageRatingAttribute(): float
     {

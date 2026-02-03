@@ -12,9 +12,10 @@ use Illuminate\Notifications\Notifiable;
  * User Model - Represents application users.
  *
  * Roles:
- * - `user`: Default role for registered users.
- * - `advanced`: Can create/edit their own vacations.
- * - `admin`: Full administrative access.
+ * - `user`: Default role for registered users (Can book/review).
+ * - `verified`: Verified identity (formerly advanced), manages own vacations.
+ * - `advanced`: Can create vacations (requires approval), manages own.
+ * - `admin`: Full administrative access (approves vacations).
  *
  * @property int $id
  * @property string $name
@@ -106,6 +107,16 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Check if user is verified role.
+     *
+     * @return bool
+     */
+    public function isVerifiedRole(): bool
+    {
+        return $this->isRol('verified');
+    }
+
+    /**
      * Check if user has booked a specific vacation.
      *
      * @param int $vacationId The vacation ID to check.
@@ -119,31 +130,16 @@ class User extends Authenticatable implements MustVerifyEmail
             ->exists();
     }
 
-    /**
-     * Get the vacations created by this user.
-     *
-     * @return HasMany
-     */
     public function vacations(): HasMany
     {
         return $this->hasMany(Vacation::class, 'user_id');
     }
 
-    /**
-     * Get the bookings made by this user.
-     *
-     * @return HasMany
-     */
     public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class, 'user_id');
     }
 
-    /**
-     * Get the reviews made by this user.
-     *
-     * @return HasMany
-     */
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class, 'user_id');
